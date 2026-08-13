@@ -3,7 +3,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from enum import Enum,IntEnum
 
-class AggregationType(Enum):
+class AggregationType(IntEnum):
     NONE = 0
     SUM = 1
     AVERAGE = 2
@@ -28,7 +28,7 @@ class Frequency(IntEnum):
     MONTHLY = 12
     """One event every month."""
 
-class ResultStatusType(Enum):
+class ResultStatusType(IntEnum):
     STATUS_OK = 0
     STATUS_ERROR = 1
     STATUS_WARNING = 2
@@ -51,6 +51,9 @@ class DescriptiveStatistics:
     q25: float
     q50: float
     q75: float
+
+    def __str__(self):
+        return f"DescriptiveStatistics(id={self.id}, status={self.status}, n={self.n}, n_missing={self.n_missing}, max={self.max}, min={self.min}, average={self.average}, std_dev={self.std_dev}, q25={self.q25}, q50={self.q50}, q75={self.q75})"
 
 @dataclass(frozen=True)
 class Matrix:
@@ -140,4 +143,9 @@ class VersionInfo:
 
     def __str__(self):
         return f'{self.major}.{self.minor}.{self.revision}'
+
+@dataclass(frozen=True)
+class Observation:
+    date: date
+    value: float
 
