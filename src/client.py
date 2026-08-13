@@ -1,5 +1,6 @@
 import grpc
 
+from mapper import Mapper
 from src.jdplus.main.ws.v1.toolkit_basic_pb2_grpc import TsFunctionsStub
 from src.jdplus.main.ws.v1.toolkit_messages_pb2 import EmptyDto
 from src.models import VersionInfo
@@ -15,5 +16,5 @@ class CommunicationManager:
             stub = TsFunctionsStub(channel)
             req = EmptyDto()
             dto = stub.GetVersion(req)
-            return VersionInfo(dto)
+            return Mapper.to_model(dto)
 
