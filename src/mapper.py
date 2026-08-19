@@ -1,6 +1,6 @@
 from jdplus.main.ws.v1.toolkit_messages_pb2 import VersionInfoDto, TsDataDto, TsPeriodDto, DescriptiveStatisticsDto, \
-    DateDto
-from models import VersionInfo, TsData, TsPeriod, DescriptiveStatistics, ResultStatus
+    DateDto, TemporalDisaggregationResultsDto
+from models import VersionInfo, TsData, TsPeriod, DescriptiveStatistics, ResultStatus, TemporalDisaggregationResults
 
 from datetime import date
 
@@ -67,5 +67,16 @@ class DescriptiveStatisticsMapper:
             q50= dto.q50,
             q75= dto.q75,
             status= ResultStatus(type=dto.status.type, message=dto.status.message)
+        )
+        return model
+
+class TemporalDisaggregationResultsMapper:
+    @staticmethod
+    def to_model(dto: TemporalDisaggregationResultsDto) -> TemporalDisaggregationResults:
+        model = TemporalDisaggregationResults(
+            originalSeries= TsDataMapper.to_model(dto.originalSeries),
+            disaggregatedSeries= TsDataMapper.to_model(dto.disaggregatedSeries),
+            stDevDisaggregatedSeries= TsDataMapper.to_model(dto.stDevDisaggregatedSeries),
+            regressionEffects= TsDataMapper.to_model(dto.regressionEffects)
         )
         return model

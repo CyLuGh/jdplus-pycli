@@ -471,7 +471,7 @@ class ParameterDto(_message.Message):
     def __init__(self, value: _Optional[float] = ..., type: _Optional[_Union[ParameterType, str]] = ..., description: _Optional[str] = ...) -> None: ...
 
 class DiffuseLikelihoodStatisticsDto(_message.Message):
-    __slots__ = ("nobs", "ndiffuse", "nparams", "degrees_of_freedom", "log_likelihood", "adjusted_log_likelihood", "aic", "aicc", "bic", "ssq", "ssqerr", "ldet", "dcorrection")
+    __slots__ = ("nobs", "ndiffuse", "nparams", "degrees_of_freedom", "log_likelihood", "adjusted_log_likelihood", "aic", "aicc", "bic", "ssq", "ldet", "dcorrection")
     NOBS_FIELD_NUMBER: _ClassVar[int]
     NDIFFUSE_FIELD_NUMBER: _ClassVar[int]
     NPARAMS_FIELD_NUMBER: _ClassVar[int]
@@ -482,7 +482,6 @@ class DiffuseLikelihoodStatisticsDto(_message.Message):
     AICC_FIELD_NUMBER: _ClassVar[int]
     BIC_FIELD_NUMBER: _ClassVar[int]
     SSQ_FIELD_NUMBER: _ClassVar[int]
-    SSQERR_FIELD_NUMBER: _ClassVar[int]
     LDET_FIELD_NUMBER: _ClassVar[int]
     DCORRECTION_FIELD_NUMBER: _ClassVar[int]
     nobs: int
@@ -495,10 +494,9 @@ class DiffuseLikelihoodStatisticsDto(_message.Message):
     aicc: float
     bic: float
     ssq: float
-    ssqerr: float
     ldet: float
     dcorrection: float
-    def __init__(self, nobs: _Optional[int] = ..., ndiffuse: _Optional[int] = ..., nparams: _Optional[int] = ..., degrees_of_freedom: _Optional[int] = ..., log_likelihood: _Optional[float] = ..., adjusted_log_likelihood: _Optional[float] = ..., aic: _Optional[float] = ..., aicc: _Optional[float] = ..., bic: _Optional[float] = ..., ssq: _Optional[float] = ..., ssqerr: _Optional[float] = ..., ldet: _Optional[float] = ..., dcorrection: _Optional[float] = ...) -> None: ...
+    def __init__(self, nobs: _Optional[int] = ..., ndiffuse: _Optional[int] = ..., nparams: _Optional[int] = ..., degrees_of_freedom: _Optional[int] = ..., log_likelihood: _Optional[float] = ..., adjusted_log_likelihood: _Optional[float] = ..., aic: _Optional[float] = ..., aicc: _Optional[float] = ..., bic: _Optional[float] = ..., ssq: _Optional[float] = ..., ldet: _Optional[float] = ..., dcorrection: _Optional[float] = ...) -> None: ...
 
 class TsDomainDto(_message.Message):
     __slots__ = ("startPeriod", "length")
@@ -571,7 +569,7 @@ class StatisticalTestDto(_message.Message):
     def __init__(self, value: _Optional[float] = ..., pValue: _Optional[float] = ..., description: _Optional[str] = ...) -> None: ...
 
 class TemporalDisaggregationRequestDto(_message.Message):
-    __slots__ = ("y", "constant", "trend", "indicators", "model", "average", "rho", "fixedRho", "truncatedRho", "zeroInit", "algorithm", "diffuserEgs")
+    __slots__ = ("y", "constant", "trend", "indicators", "model", "average", "rho", "fixedRho", "truncatedRho", "zeroInit", "algorithm", "diffuserEgs", "n_backcasts", "n_forecasts", "frequency")
     Y_FIELD_NUMBER: _ClassVar[int]
     CONSTANT_FIELD_NUMBER: _ClassVar[int]
     TREND_FIELD_NUMBER: _ClassVar[int]
@@ -584,6 +582,9 @@ class TemporalDisaggregationRequestDto(_message.Message):
     ZEROINIT_FIELD_NUMBER: _ClassVar[int]
     ALGORITHM_FIELD_NUMBER: _ClassVar[int]
     DIFFUSEREGS_FIELD_NUMBER: _ClassVar[int]
+    N_BACKCASTS_FIELD_NUMBER: _ClassVar[int]
+    N_FORECASTS_FIELD_NUMBER: _ClassVar[int]
+    FREQUENCY_FIELD_NUMBER: _ClassVar[int]
     y: TsDataDto
     constant: bool
     trend: bool
@@ -596,7 +597,10 @@ class TemporalDisaggregationRequestDto(_message.Message):
     zeroInit: bool
     algorithm: str
     diffuserEgs: bool
-    def __init__(self, y: _Optional[_Union[TsDataDto, _Mapping]] = ..., constant: _Optional[bool] = ..., trend: _Optional[bool] = ..., indicators: _Optional[_Iterable[_Union[TsDataDto, _Mapping]]] = ..., model: _Optional[str] = ..., average: _Optional[bool] = ..., rho: _Optional[float] = ..., fixedRho: _Optional[bool] = ..., truncatedRho: _Optional[float] = ..., zeroInit: _Optional[bool] = ..., algorithm: _Optional[str] = ..., diffuserEgs: _Optional[bool] = ...) -> None: ...
+    n_backcasts: int
+    n_forecasts: int
+    frequency: int
+    def __init__(self, y: _Optional[_Union[TsDataDto, _Mapping]] = ..., constant: _Optional[bool] = ..., trend: _Optional[bool] = ..., indicators: _Optional[_Iterable[_Union[TsDataDto, _Mapping]]] = ..., model: _Optional[str] = ..., average: _Optional[bool] = ..., rho: _Optional[float] = ..., fixedRho: _Optional[bool] = ..., truncatedRho: _Optional[float] = ..., zeroInit: _Optional[bool] = ..., algorithm: _Optional[str] = ..., diffuserEgs: _Optional[bool] = ..., n_backcasts: _Optional[int] = ..., n_forecasts: _Optional[int] = ..., frequency: _Optional[int] = ...) -> None: ...
 
 class VersionInfoDto(_message.Message):
     __slots__ = ("major", "minor", "revision")

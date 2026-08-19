@@ -1,10 +1,12 @@
 import grpc
 
-from mapper import VersionInfoMapper, TsDataMapper, DescriptiveStatisticsMapper, DateMapper
+from mapper import VersionInfoMapper, TsDataMapper, DescriptiveStatisticsMapper, DateMapper, \
+    TemporalDisaggregationResultsMapper
 from src.jdplus.main.ws.v1.toolkit_basic_pb2_grpc import TsFunctionsStub
 from src.jdplus.main.ws.v1.toolkit_messages_pb2 import EmptyDto, TsFunctionInputDto, BuildTsDataInputDto, \
-    BuildTsDataObsDto
-from src.models import VersionInfo, DescriptiveStatistics, Frequency, TsData, Observation, AggregationType
+    BuildTsDataObsDto, TemporalDisaggregationRequestDto
+from src.models import VersionInfo, DescriptiveStatistics, Frequency, TsData, Observation, AggregationType, \
+    TemporalDisaggregationResults
 
 
 class CommunicationManager:
@@ -45,3 +47,40 @@ class CommunicationManager:
             dto = stub.BuildTsData(req)
             return TsDataMapper.to_model(dto.series)
 
+    def process_temporal_disaggregation(self,
+                               y: TsData,
+                               constant: bool,
+                               trend: bool,
+                               model: str,
+                               freq: int,
+                               average: bool,
+                               rho: float,
+                               fixed_rho: bool,
+                               truncated_rho: float,
+                               zero_init: bool,
+                               algorithm: str,
+                               diffuser_egs: bool,
+                               n_backcasts: int,
+                               n_forecasts: int) -> TemporalDisaggregationResults:
+        with grpc.insecure_channel(self.url) as channel:
+            stub = TsFunctionsStub(channel)
+            req = TemporalDisaggregationRequestDto()
+            req.y.start.year = y.start.year
+            req.y.start.pos = y.start.position
+            req.y.start.frequency = y.start.frequency
+            req.y.values.extend(y.values)
+            req.constant = constant
+            req.trend = trend
+            req.model = model
+            req.frequency = freq
+            req.average = average
+            req.rho = rho
+            req.fixedRho = fixed_rho
+            req.truncatedRho = truncated_rho
+            req.zeroInit = zero_init
+            req.algorithm = algorithm
+            req.diffuserEgs = diffuser_egs
+            req.n_backcasts = n_backcasts
+            req.n_forecasts = n_forecasts
+            dto = stub.ProcessTemporalDisaggregation(req)
+            return TemporalDisaggregationResultsMapper.to_model(dto)

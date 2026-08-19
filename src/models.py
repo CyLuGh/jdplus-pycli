@@ -98,7 +98,7 @@ class TsPeriod:
         return cls(frequency=Frequency.UNDEFINED, year=1900, position=0)
 
     def to_date(self) -> date:
-        return date(self.year, 1,1) + relativedelta(months=self.monthly_occurrences_per_year())
+        return date(self.year, 1,1) + relativedelta(months=self.monthly_occurrences_per_year()*self.position)
 
     def monthly_occurrences_per_year(self) -> int:
         if self.frequency == Frequency.UNDEFINED:
@@ -109,11 +109,16 @@ class TsPeriod:
 @dataclass(frozen=True)
 class TsData:
     start: TsPeriod
-    values: tuple[float] = field(default_factory=tuple)
+    values: tuple[float,...] = field(default_factory=tuple)
 
     @classmethod
     def default(cls) -> "TsData":
         return cls(start=TsPeriod.default())
+
+    def get_date_values(self) -> dict[date,float]:
+        start = self.start.to_date()
+        occurrences_per_year = self.start.monthly_occurrences_per_year()
+        return {start + relativedelta(months=i * occurrences_per_year): value for i, value in enumerate(self.values)}
 
 @dataclass(frozen=True)
 class Ts:
@@ -149,3 +154,9 @@ class Observation:
     date: date
     value: float
 
+@dataclass(frozen=True)
+class TemporalDisaggregationResults:
+    originalSeries: TsData
+    disaggregatedSeries: TsData
+    stDevDisaggregatedSeries: TsData
+    regressionEffects: TsData
