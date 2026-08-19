@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import date
+
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from enum import Enum,IntEnum
 
@@ -160,3 +162,13 @@ class TemporalDisaggregationResults:
     disaggregatedSeries: TsData
     stDevDisaggregatedSeries: TsData
     regressionEffects: TsData
+
+    def as_dataframe(self) -> pd.DataFrame:
+        df = pd.DataFrame({
+            "original": self.originalSeries.get_date_values(),
+            "disaggregated": self.disaggregatedSeries.get_date_values(),
+            "stDevDisaggregated": self.stDevDisaggregatedSeries.get_date_values(),
+            "regressionEffects": self.regressionEffects.get_date_values(),
+        })
+        df = df.sort_index()
+        return df
