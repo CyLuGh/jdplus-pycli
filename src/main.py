@@ -8,9 +8,10 @@ if __name__ == '__main__':
     cM = CommunicationManager()
     print(cM.get_version())
 
-    # data = generate_ts_data(2000,0,Frequency.MONTHLY,240)
-    # stats = cM.get_descriptive_statistics(data)
-    # print(stats)
+    data = generate_ts_data(2000,0,Frequency.MONTHLY,240, True)
+    stats = cM.get_descriptive_statistics(data)
+    print(stats)
+
     #
     # obs = [Observation(date=date(2022,1,1),value=1),
     #        Observation(date=date(2022,2,1),value=1),

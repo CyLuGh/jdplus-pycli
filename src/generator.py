@@ -16,8 +16,21 @@ def generate_ts(year: int = 2000,
 def generate_ts_data(year: int = 2000,
                      position: int = 0,
                      frequency: Frequency = Frequency.YEARLY,
-                     count: int = 10) -> TsData:
+                     count: int = 10,
+                     tweak: bool = False) -> TsData:
+    def tweak_random(apply: bool, index: int) -> float:
+        if apply:
+            remain = index % 6
+            match remain:
+                case 5: return random.randrange(1100, 1300)
+                case 4: return random.randrange(700, 1000)
+                case 3: return random.randrange(600, 900)
+                case 2: return random.randrange(1200, 1500)
+                case _: return random.randrange(950, 1050)
+        else:
+            return 1000
+
     return TsData(
         start=TsPeriod(year=year, position=position, frequency=frequency),
-        values=tuple(random.random() * 1000 for _ in range(count))
+        values=tuple(random.random() * tweak_random(tweak,idx) for idx in range(count))
     )
