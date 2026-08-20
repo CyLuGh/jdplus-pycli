@@ -55,7 +55,17 @@ class DescriptiveStatistics:
     q75: float
 
     def __str__(self):
-        return f"DescriptiveStatistics(id={self.id}, status={self.status}, n={self.n}, n_missing={self.n_missing}, max={self.max}, min={self.min}, average={self.average}, std_dev={self.std_dev}, q25={self.q25}, q50={self.q50}, q75={self.q75})"
+        return (
+            f"{'N':<15}{self.n}\n"
+            f"{'N Missing':<15}{self.n_missing}\n"
+            f"{'Max':<15}{self.max}\n"
+            f"{'Min':<15}{self.min}\n"
+            f"{'Average':<15}{self.average}\n"
+            f"{'StDev':<15}{self.std_dev}\n"
+            f"{'Q25':<15}{self.q25}\n"
+            f"{'Q50':<15}{self.q50}\n"
+            f"{'Q75':<15}{self.q75}"
+        )
 
 @dataclass(frozen=True)
 class Matrix:
@@ -157,11 +167,75 @@ class Observation:
     value: float
 
 @dataclass(frozen=True)
+class DiffuseLikelihoodStatistics:
+    n_obs: int
+    n_diffuse: int
+    n_params: int
+    degrees_of_freedom: int
+    log_likelihood: float
+    adjusted_log_likelihood: float
+    aic: float
+    aicc: float
+    bic: float
+    ssq: float
+    ldet: float
+    dcorrection: float
+
+    def __str__(self):
+        return (
+            f"{'N Obs':<25}{self.n_obs}\n"
+            f"{'N Diffuse':<25}{self.n_diffuse}\n"
+            f"{'N Params':<25}{self.n_params}\n"
+            f"{'Degrees of freedom':<25}{self.degrees_of_freedom}\n"
+            f"{'Log likelihood':<25}{self.log_likelihood}\n"
+            f"{'Adjusted log likelihood':<25}{self.adjusted_log_likelihood}\n"
+            f"{'AIC':<25}{self.aic}\n"
+            f"{'AICC':<25}{self.aicc}\n"
+            f"{'BIC':<25}{self.bic}\n"
+            f"{'SSQ':<25}{self.ssq}\n"
+            f"{'LDet':<25}{self.ldet}\n"
+            f"{'DCorrection':<25}{self.dcorrection}"
+        )
+
+@dataclass(frozen=True)
+class DiffuseConcentratedLikelihood:
+    ll: float
+    ssqerr: float
+    ldet: float
+    lddet: float
+    n_obs: int
+    nd: int
+    nxd: int
+    bvar: Matrix
+    legacy: bool
+    scaling_factor: bool
+    res: tuple[float, ...] = field(default_factory=tuple)
+    b: tuple[float, ...] = field(default_factory=tuple)
+
+    def __str__(self):
+        return (
+            f"{'N Obs':<25}{self.n_obs}\n"
+            f"{'ll':<25}{self.ll}\n"
+            f"{'ssqerr':<25}{self.ssqerr}\n"
+            f"{'ldet':<25}{self.ldet}\n"
+            f"{'lddet':<25}{self.lddet}\n"
+            f"{'nd':<25}{self.nd}\n"
+            f"{'nxd':<25}{self.nxd}\n"
+            f"{'bvar':<25}{self.bvar}\n"
+            f"{'legacy':<25}{self.legacy}\n"
+            f"{'Scaling factor':<25}{self.scaling_factor}\n"
+            f"{'res':<25}{self.res}\n"
+            f"{'b':<25}{self.b}\n"
+        )
+
+@dataclass(frozen=True)
 class TemporalDisaggregationResults:
     originalSeries: TsData
     disaggregatedSeries: TsData
     stDevDisaggregatedSeries: TsData
     regressionEffects: TsData
+    statistics: DiffuseLikelihoodStatistics
+    likelihood: DiffuseConcentratedLikelihood
 
     def as_dataframe(self) -> pd.DataFrame:
         df = pd.DataFrame({

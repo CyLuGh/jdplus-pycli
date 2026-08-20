@@ -1,6 +1,8 @@
 from jdplus.main.ws.v1.toolkit_messages_pb2 import VersionInfoDto, TsDataDto, TsPeriodDto, DescriptiveStatisticsDto, \
-    DateDto, TemporalDisaggregationResultsDto
-from models import VersionInfo, TsData, TsPeriod, DescriptiveStatistics, ResultStatus, TemporalDisaggregationResults
+    DateDto, TemporalDisaggregationResultsDto, DiffuseLikelihoodStatisticsDto, DiffuseConcentratedLikelihoodDto, \
+    MatrixDto
+from models import VersionInfo, TsData, TsPeriod, DescriptiveStatistics, ResultStatus, TemporalDisaggregationResults, \
+    DiffuseLikelihoodStatistics, DiffuseConcentratedLikelihood, Matrix
 
 from datetime import date
 
@@ -77,6 +79,56 @@ class TemporalDisaggregationResultsMapper:
             originalSeries= TsDataMapper.to_model(dto.originalSeries),
             disaggregatedSeries= TsDataMapper.to_model(dto.disaggregatedSeries),
             stDevDisaggregatedSeries= TsDataMapper.to_model(dto.stDevDisaggregatedSeries),
-            regressionEffects= TsDataMapper.to_model(dto.regressionEffects)
+            regressionEffects= TsDataMapper.to_model(dto.regressionEffects),
+            statistics=DiffuseLikelihoodStatisticsMapper.to_model(dto.stats),
+            likelihood=DiffuseConcentratedLikelihoodMapper.to_model(dto.likelihood)
+        )
+        return model
+
+class DiffuseLikelihoodStatisticsMapper:
+    @staticmethod
+    def to_model(dto: DiffuseLikelihoodStatisticsDto) -> DiffuseLikelihoodStatistics:
+        model = DiffuseLikelihoodStatistics(
+            n_obs=dto.nobs,
+            n_diffuse=dto.ndiffuse,
+            n_params=dto.nparams,
+            degrees_of_freedom=dto.degrees_of_freedom,
+            log_likelihood=dto.log_likelihood,
+            adjusted_log_likelihood=dto.adjusted_log_likelihood,
+            aic=dto.aic,
+            aicc=dto.aicc,
+            bic=dto.bic,
+            ssq=dto.ssq,
+            ldet=dto.ldet,
+            dcorrection=dto.dcorrection
+        )
+        return model
+
+class MatrixMapper:
+    @staticmethod
+    def to_model(dto: MatrixDto) -> Matrix:
+        model = Matrix(
+            n_rows=dto.nrows,
+            n_cols=dto.ncols,
+            values=tuple(dto.values)
+        )
+        return model
+
+class DiffuseConcentratedLikelihoodMapper:
+    @staticmethod
+    def to_model(dto: DiffuseConcentratedLikelihoodDto) -> DiffuseConcentratedLikelihood:
+        model = DiffuseConcentratedLikelihood(
+            ll=dto.ll,
+            ssqerr=dto.ssqerr,
+            ldet=dto.ldet,
+            lddet=dto.lddet,
+            n_obs=dto.nobs,
+            nd=dto.nd,
+            nxd=dto.nxd,
+            bvar=MatrixMapper.to_model(dto.bvar),
+            legacy=dto.legacy,
+            scaling_factor=dto.scalingFactor,
+            res=tuple(dto.res),
+            b=tuple(dto.res)
         )
         return model
