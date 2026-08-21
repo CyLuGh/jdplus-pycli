@@ -1,15 +1,16 @@
 from generator import generate_ts_data
 from mapper import TsDataMapper
-from models import Frequency, Observation, AggregationType, TsData, TsPeriod
-from src.client import CommunicationManager
+from models import Frequency, Observation, AggregationType, TsData, TsPeriod, DescriptiveStatistics, \
+    TemporalDisaggregationResults
+from client import CommunicationManager
 from datetime import date
 
 if __name__ == '__main__':
-    cM = CommunicationManager()
+    cM: CommunicationManager = CommunicationManager()
     print(cM.get_version())
 
-    data = generate_ts_data(2000,0,Frequency.MONTHLY,240, True)
-    stats = cM.get_descriptive_statistics(data)
+    data: TsData = generate_ts_data(2000,0,Frequency.MONTHLY,240, True)
+    stats: DescriptiveStatistics = cM.get_descriptive_statistics(data)
     print(stats)
 
     #
@@ -26,7 +27,7 @@ if __name__ == '__main__':
 
     y = TsData( start= TsPeriod( year= 1977, position= 0, frequency= Frequency.YEARLY ),
                 values=(500.0,510.0,525.0,520.0))
-    disaggregated = cM.process_temporal_disaggregation(y,False, False, "Rw", 12, False, 0, False, 0, False, "SqrtDiffuse", False, 0, 6)
+    disaggregated: TemporalDisaggregationResults = cM.process_temporal_disaggregation(y,False, False, "Rw", 12, False, 0, False, 0, False, "SqrtDiffuse", False, 0, 6)
 
     print(disaggregated.stDevDisaggregatedSeries.get_date_values())
     print(disaggregated.as_dataframe())

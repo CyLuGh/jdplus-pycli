@@ -2,19 +2,21 @@ import grpc
 
 from mapper import VersionInfoMapper, TsDataMapper, DescriptiveStatisticsMapper, DateMapper, \
     TemporalDisaggregationResultsMapper
-from src.jdplus.main.ws.v1.toolkit_basic_pb2_grpc import TsFunctionsStub
-from src.jdplus.main.ws.v1.toolkit_messages_pb2 import EmptyDto, TsFunctionInputDto, BuildTsDataInputDto, \
+from jdplus.main.ws.v1.toolkit_basic_pb2_grpc import TsFunctionsStub
+from jdplus.main.ws.v1.toolkit_messages_pb2 import EmptyDto, TsFunctionInputDto, BuildTsDataInputDto, \
     BuildTsDataObsDto, TemporalDisaggregationRequestDto
-from src.models import VersionInfo, DescriptiveStatistics, Frequency, TsData, Observation, AggregationType, \
+from models import VersionInfo, DescriptiveStatistics, Frequency, TsData, Observation, AggregationType, \
     TemporalDisaggregationResults
 
 
 class CommunicationManager:
+    """Offers entry points towards JD+ engine."""
     url: str
-    def __init__(self):
-        self.url = 'localhost:4566'
+    def __init__(self, url:str = 'localhost:4566'):
+        self.url = url
 
     def get_version(self) -> VersionInfo:
+        """Provides information about the JD+ engine version."""
         with grpc.insecure_channel(self.url) as channel:
             stub = TsFunctionsStub(channel)
             req = EmptyDto()
@@ -22,6 +24,7 @@ class CommunicationManager:
             return VersionInfoMapper.to_model(dto)
 
     def get_descriptive_statistics(self, ts_data: TsData) -> DescriptiveStatistics:
+        """Provides descriptive statistics for time series data."""
         with grpc.insecure_channel(self.url) as channel:
             stub = TsFunctionsStub(channel)
             req = TsFunctionInputDto(id= "", series= TsDataMapper.to_dto(ts_data))
@@ -29,12 +32,13 @@ class CommunicationManager:
             return DescriptiveStatisticsMapper.to_model(dto)
 
     def build_ts_data(self,
-                      data: tuple[Observation],
+                      data: tuple[Observation,...],
                       aggregation_type: AggregationType = AggregationType.NONE,
                       frequency: Frequency = Frequency.YEARLY,
                       allow_partial_aggregation: bool = True,
                       include_missing_values: bool = True
                       ) -> TsData:
+        """Builds time series from provided observations."""
         with grpc.insecure_channel(self.url) as channel:
             stub = TsFunctionsStub(channel)
             req = BuildTsDataInputDto()

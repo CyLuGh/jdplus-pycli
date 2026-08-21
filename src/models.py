@@ -3,7 +3,8 @@ from datetime import date
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from enum import Enum,IntEnum
+from enum import IntEnum
+from pydantic import BaseModel
 
 class AggregationType(IntEnum):
     NONE = 0
@@ -36,12 +37,12 @@ class ResultStatusType(IntEnum):
     STATUS_WARNING = 2
 
 @dataclass(frozen=True)
-class ResultStatus:
+class ResultStatus(BaseModel):
     type: ResultStatusType
     message: str
 
 @dataclass(frozen=True)
-class DescriptiveStatistics:
+class DescriptiveStatistics(BaseModel):
     id: str
     status: ResultStatus
     n: int
@@ -68,7 +69,7 @@ class DescriptiveStatistics:
         )
 
 @dataclass(frozen=True)
-class Matrix:
+class Matrix(BaseModel):
     n_rows: int
     n_cols: int
     values: tuple[float]
@@ -80,7 +81,7 @@ class Matrix:
             raise ValueError(f"Expected {expected} values, got {len(self.values)}")
 
 @dataclass(frozen=True)
-class TsMoniker:
+class TsMoniker(BaseModel):
     source: str
     id: str
 
@@ -89,7 +90,7 @@ class TsMoniker:
         return cls(id='Default', source='Default')
 
 @dataclass(frozen=True)
-class TsObservation:
+class TsObservation(BaseModel):
     start: date
     end: date
     value: float
@@ -99,7 +100,7 @@ class TsObservation:
         return cls(start=observation_date, end=observation_date, value=value)
 
 @dataclass(frozen=True)
-class TsPeriod:
+class TsPeriod(BaseModel):
     frequency: Frequency
     year: int
     position: int
@@ -119,21 +120,28 @@ class TsPeriod:
             return 12 // self.frequency
 
 @dataclass(frozen=True)
-class TsData:
+class TsData(BaseModel):
     start: TsPeriod
     values: tuple[float,...] = field(default_factory=tuple)
 
     @classmethod
     def default(cls) -> "TsData":
-        return cls(start=TsPeriod.default())
+        return cls(start=TsPeriod.default(), values=())
 
     def get_date_values(self) -> dict[date,float]:
         start = self.start.to_date()
         occurrences_per_year = self.start.monthly_occurrences_per_year()
         return {start + relativedelta(months=i * occurrences_per_year): value for i, value in enumerate(self.values)}
 
+    def as_dataframe(self) -> pd.DataFrame:
+        df = pd.DataFrame({
+            "values": self.get_date_values()
+        })
+        df = df.sort_index()
+        return df
+
 @dataclass(frozen=True)
-class Ts:
+class Ts(BaseModel):
     name: str
     moniker: TsMoniker
     data: TsData
@@ -144,14 +152,14 @@ class Ts:
         return cls(name="Default",data=TsData.default(),moniker=TsMoniker.default())
 
 @dataclass(frozen=True)
-class TimeSeries:
+class TimeSeries(BaseModel):
     name: str
     moniker: TsMoniker
     data: tuple[TsObservation]
     metadata: dict[str, str] = field(default_factory=dict)
 
 @dataclass(frozen=True)
-class VersionInfo:
+class VersionInfo(BaseModel):
     """Service version information"""
 
     major: int
@@ -162,12 +170,12 @@ class VersionInfo:
         return f'{self.major}.{self.minor}.{self.revision}'
 
 @dataclass(frozen=True)
-class Observation:
+class Observation(BaseModel):
     date: date
     value: float
 
 @dataclass(frozen=True)
-class DiffuseLikelihoodStatistics:
+class DiffuseLikelihoodStatistics(BaseModel):
     n_obs: int
     n_diffuse: int
     n_params: int
@@ -198,7 +206,7 @@ class DiffuseLikelihoodStatistics:
         )
 
 @dataclass(frozen=True)
-class DiffuseConcentratedLikelihood:
+class DiffuseConcentratedLikelihood(BaseModel):
     ll: float
     ssqerr: float
     ldet: float
@@ -229,7 +237,10 @@ class DiffuseConcentratedLikelihood:
         )
 
 @dataclass(frozen=True)
-class TemporalDisaggregationResults:
+class TemporalDisaggregationResults(BaseModel):
+    """
+    Results of temporal disaggregation
+    """
     originalSeries: TsData
     disaggregatedSeries: TsData
     stDevDisaggregatedSeries: TsData
@@ -238,6 +249,10 @@ class TemporalDisaggregationResults:
     likelihood: DiffuseConcentratedLikelihood
 
     def as_dataframe(self) -> pd.DataFrame:
+        """
+        Returns a dataframe containing original and disaggregated series with the standard deviations series as well.
+        It may include regression effects if available.
+        """
         df = pd.DataFrame({
             "original": self.originalSeries.get_date_values(),
             "disaggregated": self.disaggregatedSeries.get_date_values(),

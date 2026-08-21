@@ -1,7 +1,7 @@
 import random
 import uuid
 
-from src.models import Frequency, TsData, TsPeriod, Ts, TsMoniker
+from models import Frequency, TsData, TsPeriod, Ts, TsMoniker
 
 def generate_ts(year: int = 2000,
                      position: int = 0,

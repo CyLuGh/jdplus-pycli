@@ -6,8 +6,6 @@ from models import VersionInfo, TsData, TsPeriod, DescriptiveStatistics, ResultS
 
 from datetime import date
 
-
-
 class VersionInfoMapper:
     @staticmethod
     def to_model(dto: VersionInfoDto) -> VersionInfo:
@@ -79,7 +77,7 @@ class TemporalDisaggregationResultsMapper:
             originalSeries= TsDataMapper.to_model(dto.originalSeries),
             disaggregatedSeries= TsDataMapper.to_model(dto.disaggregatedSeries),
             stDevDisaggregatedSeries= TsDataMapper.to_model(dto.stDevDisaggregatedSeries),
-            regressionEffects= TsDataMapper.to_model(dto.regressionEffects),
+            regressionEffects= (TsDataMapper.to_model(dto.regressionEffects) if dto.HasField('regressionEffects') else TsData.default()),
             statistics=DiffuseLikelihoodStatisticsMapper.to_model(dto.stats),
             likelihood=DiffuseConcentratedLikelihoodMapper.to_model(dto.likelihood)
         )
